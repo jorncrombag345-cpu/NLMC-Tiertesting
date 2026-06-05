@@ -1,4 +1,4 @@
-```html id="n6vq9r"
+```html id="5a6f9m"
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -192,16 +192,16 @@ const ADMIN_PASSWORD = "5676";
 
 const tierRank = {
 
-    "HT1":1,
-    "LT1":2,
-    "HT2":3,
-    "LT2":4,
-    "HT3":5,
-    "LT3":6,
-    "HT4":7,
-    "LT4":8,
-    "HT5":9,
-    "LT5":10
+    "HT1":10,
+    "LT1":9,
+    "HT2":8,
+    "LT2":7,
+    "HT3":6,
+    "LT3":5,
+    "HT4":4,
+    "LT4":3,
+    "HT5":2,
+    "LT5":1
 
 };
 
@@ -289,7 +289,7 @@ async function loadPlayers(){
 
     board.innerHTML = "";
 
-    data.sort((a,b) => tierRank[a.tier] - tierRank[b.tier]);
+    data.sort((a,b) => tierRank[b.tier] - tierRank[a.tier]);
 
     data.forEach(entry => {
 
@@ -306,7 +306,7 @@ async function loadPlayers(){
                 </div>
 
                 <div>
-                    ${entry.gamemode} • ${entry.tier}
+                    ${entry.gamemode} • ${entry.tier} • ${tierRank[entry.tier]} punten
                 </div>
 
                 ${
