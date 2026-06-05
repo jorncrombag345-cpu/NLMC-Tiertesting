@@ -1,4 +1,4 @@
-```html
+```html id="m8r4gv"
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -29,25 +29,6 @@ h1{
     text-shadow:2px 2px black;
 }
 
-input,select,button{
-    padding:12px;
-    margin:5px;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-}
-
-button{
-    background:#55ff55;
-    color:black;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
 .player{
     background:#1e1e1e;
     padding:15px;
@@ -62,26 +43,19 @@ button:hover{
     font-weight:bold;
 }
 
-.deleteBtn{
-    background:red;
-    color:white;
-    margin-top:10px;
-}
-
-.adminBox{
-    background:#1a1a1a;
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:20px;
-}
-
 .filterButtons{
     margin-bottom:20px;
 }
 
 .filterButtons button{
+    padding:12px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
     background:#333;
     color:white;
+    cursor:pointer;
+    font-weight:bold;
 }
 
 .filterButtons button:hover{
@@ -96,48 +70,6 @@ button:hover{
 <div class="container">
 
 <h1>NL Tier Testing</h1>
-
-<div class="adminBox">
-
-<h2>Admin Login</h2>
-
-<input type="password" id="password" placeholder="Admin wachtwoord">
-<button onclick="login()">Login</button>
-
-<div id="adminPanel" style="display:none;">
-
-<h2>Tier toevoegen</h2>
-
-<input type="text" id="playerName" placeholder="Spelernaam">
-
-<select id="gamemode">
-<option>Spear</option>
-<option>Mace</option>
-<option>Sword</option>
-<option>UHC</option>
-<option>Speed</option>
-<option>Axe</option>
-<option>Vanilla</option>
-</select>
-
-<select id="tier">
-<option>HT1</option>
-<option>LT1</option>
-<option>HT2</option>
-<option>LT2</option>
-<option>HT3</option>
-<option>LT3</option>
-<option>HT4</option>
-<option>LT4</option>
-<option>HT5</option>
-<option>LT5</option>
-</select>
-
-<button onclick="addPlayer()">Opslaan</button>
-
-</div>
-
-</div>
 
 <h2>Gamemode Filter</h2>
 
@@ -162,8 +94,6 @@ button:hover{
 
 <script>
 
-const ADMIN_PASSWORD = "1234";
-
 const tierRank = {
     "HT1":1,
     "LT1":2,
@@ -177,30 +107,9 @@ const tierRank = {
     "LT5":10
 };
 
-let isAdmin = false;
-
 let currentFilter = "ALL";
 
-function login(){
-
-    const pass = document.getElementById("password").value;
-
-    if(pass === ADMIN_PASSWORD){
-
-        isAdmin = true;
-
-        document.getElementById("adminPanel").style.display = "block";
-
-        alert("Ingelogd!");
-
-        renderLeaderboard();
-
-    } else {
-
-        alert("Verkeerd wachtwoord");
-
-    }
-}
+let allPlayers = [];
 
 function filterMode(mode){
 
@@ -209,36 +118,11 @@ function filterMode(mode){
     renderLeaderboard();
 }
 
-function addPlayer(){
+async function loadPlayers(){
 
-    const player = document.getElementById("playerName").value;
-    const gamemode = document.getElementById("gamemode").value;
-    const tier = document.getElementById("tier").value;
+    const response = await fetch("players.json");
 
-    if(player === "") return;
-
-    let data = JSON.parse(localStorage.getItem("tiers") || "[]");
-
-    data.push({
-        player,
-        gamemode,
-        tier
-    });
-
-    localStorage.setItem("tiers", JSON.stringify(data));
-
-    document.getElementById("playerName").value = "";
-
-    renderLeaderboard();
-}
-
-function deletePlayer(index){
-
-    let data = JSON.parse(localStorage.getItem("tiers") || "[]");
-
-    data.splice(index,1);
-
-    localStorage.setItem("tiers", JSON.stringify(data));
+    allPlayers = await response.json();
 
     renderLeaderboard();
 }
@@ -247,13 +131,13 @@ function renderLeaderboard(){
 
     const board = document.getElementById("leaderboard");
 
-    let data = JSON.parse(localStorage.getItem("tiers") || "[]");
+    let data = [...allPlayers];
 
     data.sort((a,b) => tierRank[a.tier] - tierRank[b.tier]);
 
     board.innerHTML = "";
 
-    data.forEach((entry,index) => {
+    data.forEach(entry => {
 
         if(currentFilter !== "ALL" && entry.gamemode !== currentFilter){
             return;
@@ -268,20 +152,12 @@ function renderLeaderboard(){
                     ${entry.gamemode} • ${entry.tier}
                 </div>
 
-                ${
-                    isAdmin
-                    ?
-                    `<button class="deleteBtn" onclick="deletePlayer(${index})">Delete</button>`
-                    :
-                    ""
-                }
-
             </div>
         `;
     });
 }
 
-renderLeaderboard();
+loadPlayers();
 
 </script>
 
